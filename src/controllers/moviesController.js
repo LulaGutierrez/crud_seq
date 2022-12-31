@@ -2,6 +2,7 @@ const path = require('path');
 const db = require('../database/models');
 const sequelize = db.sequelize;
 const { Op } = require("sequelize");
+const moment = require('moment')
 
 
 //Aqui tienen una forma de llamar a cada uno de los modelos
@@ -75,20 +76,19 @@ const moviesController = {
             .catch((error) => console.log(error));
     }, 
     edit: function(req,res) {
-        let allGenres = db.Genre.findAll({
-            order: ['name'],
-        })
         let movie = db.Movie.findByPk(req.params.id);
-
-        Promise.all([allGenres, movie])
-            .then(([allGenres, movie]) => {
-                res.render('moviesEdit', {
-                    allGenres,
+        let allGenres = db.Genre.findAll({
+            order : ['name']
+        })
+        Promise.all([movie, allGenres])
+            .then(([movie, allGenres])=> {
+                return res.render('moviesEdit', {
                     Movie: movie,
-                    moment : moment
+                    allGenres,
+                    moment
                 })
             })
-            .catch((error) => console.log(error));
+            .catch(error => console.log(error))
     },
     update: function (req,res) {
         db.Movie.update({
